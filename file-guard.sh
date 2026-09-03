@@ -27,7 +27,7 @@ else
 fi
 
 if (( size >= BLOCK_BYTES )); then
-  reason="$file_path is $size bytes (≥${BLOCK_BYTES} bytes block threshold). Read blocked to protect context window. Lower FILEGUARD_BLOCK_BYTES to change this threshold."
+  reason="$file_path is $size bytes (≥${BLOCK_BYTES} bytes block threshold). Read blocked to protect context window. Raise FILEGUARD_BLOCK_BYTES to change this threshold."
   jq -n --arg reason "$reason" '{"permissionDecision":"deny","permissionDecisionReason":$reason}'
   exit 2
 elif (( size >= WARN_BYTES )); then

@@ -40,6 +40,7 @@ MATCHER_ENTRY=$(jq -n \
 
 if [[ -f "$SETTINGS_FILE" ]]; then
   existing=$(cat "$SETTINGS_FILE")
+  existing="${existing:-{}}"
 else
   existing='{}'
   mkdir -p "$(dirname "$SETTINGS_FILE")"

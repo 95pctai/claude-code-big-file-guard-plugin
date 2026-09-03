@@ -16,7 +16,7 @@ curl -fsSL https://raw.githubusercontent.com/95pctai/claude-code-big-file-guard-
 ```
 
 The installer:
-1. Copies `file-guard.sh` to `~/.claude/hooks/file-guard.sh`
+1. Downloads `file-guard.sh` to `~/.claude/hooks/file-guard.sh`
 2. Merges the `PreToolUse` hook entry into `~/.claude/settings.json` (creates the file if absent)
 3. Prints a confirmation with the installed path and threshold defaults
 
