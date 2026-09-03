@@ -41,6 +41,10 @@ MATCHER_ENTRY=$(jq -n \
 if [[ -f "$SETTINGS_FILE" ]]; then
   existing=$(cat "$SETTINGS_FILE")
   existing="${existing:-{}}"
+  if ! printf '%s' "$existing" | jq empty 2>/dev/null; then
+    echo "Error: $SETTINGS_FILE contains invalid JSON. Fix or remove it and retry." >&2
+    exit 1
+  fi
 else
   existing='{}'
   mkdir -p "$(dirname "$SETTINGS_FILE")"
