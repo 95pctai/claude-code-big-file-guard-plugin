@@ -9,7 +9,7 @@ BLOCK_BYTES="${FILEGUARD_BLOCK_BYTES:-1048576}"
 
 input=$(cat)
 
-file_path=$(printf '%s' "$input" | jq -r '.tool_input.file_path // empty' 2>/dev/null)
+file_path=$(printf '%s' "$input" | jq -r '.tool_input.file_path // empty' 2>/dev/null) || true
 
 if [[ -z "$file_path" ]]; then
   exit 0
@@ -27,13 +27,13 @@ else
 fi
 
 if (( size >= BLOCK_BYTES )); then
-  printf '{"permissionDecision":"deny","permissionDecisionReason":"%s is %d bytes (≥%d bytes block threshold). Read blocked to protect context window. Lower FILEGUARD_BLOCK_BYTES to change this threshold."}\n' \
-    "$file_path" "$size" "$BLOCK_BYTES"
+  reason="$file_path is $size bytes (≥${BLOCK_BYTES} bytes block threshold). Read blocked to protect context window. Lower FILEGUARD_BLOCK_BYTES to change this threshold."
+  jq -n --arg reason "$reason" '{"permissionDecision":"deny","permissionDecisionReason":$reason}'
   exit 2
 elif (( size >= WARN_BYTES )); then
   tokens=$(( size / 4 / 1000 ))
-  printf '{"additionalContext":"Warning: %s is %d bytes (≈%dK tokens). This is a large file — consider reading only the lines you need with the offset/limit parameters."}\n' \
-    "$file_path" "$size" "$tokens"
+  ctx="Warning: $file_path is $size bytes (≈${tokens}K tokens). This is a large file — consider reading only the lines you need with the offset/limit parameters."
+  jq -n --arg ctx "$ctx" '{"additionalContext":$ctx}'
   exit 0
 fi
 

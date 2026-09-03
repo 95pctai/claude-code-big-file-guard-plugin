@@ -4,9 +4,6 @@
 
 set -euo pipefail
 
-REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-HOOK_SRC="$REPO_ROOT/file-guard.sh"
-
 HOOKS_DIR="$HOME/.claude/hooks"
 HOOK_DEST="$HOOKS_DIR/file-guard.sh"
 
@@ -20,7 +17,16 @@ fi
 
 # Install hook script
 mkdir -p "$HOOKS_DIR"
-cp "$HOOK_SRC" "$HOOK_DEST"
+
+# When piped via curl, BASH_SOURCE[0] is empty or "/dev/stdin" — download directly.
+_src="${BASH_SOURCE[0]:-}"
+if [[ -z "$_src" || "$_src" == "/dev/stdin" ]]; then
+  curl -fsSL "https://raw.githubusercontent.com/95pctai/claude-code-big-file-guard-plugin/main/file-guard.sh" \
+    -o "$HOOK_DEST"
+else
+  REPO_ROOT="$(cd "$(dirname "$_src")" && pwd)"
+  cp "$REPO_ROOT/file-guard.sh" "$HOOK_DEST"
+fi
 chmod +x "$HOOK_DEST"
 
 # Merge hook entry into settings.json
